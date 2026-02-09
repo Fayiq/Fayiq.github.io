@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Nim Nim ❤️</title>
+    <style>
+        /* --- GLOBAL STYLES --- */
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden; /* Prevents scrolling */
+        }
+
+        /* --- BACKGROUND & OVERLAYS --- */
+        .bg-gif {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Initial Cute Gif */
+            background-image: url('https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExb3RwOWRjeDA5cXpienc0ZWM2bjBlam9paDVvcTQxNXJzNzNyOHQ4ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/RH7e0AYVpzSBeGDxF3/giphy.gif');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+            transition: background-image 0.5s ease-in-out;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Royal Maroon Gradient */
+            background: linear-gradient(135deg, rgba(128, 0, 0, 0.85), rgba(0, 0, 0, 0.7));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.8s ease;
+        }
+
+        /* --- ENTRY CURTAIN ("Tap to Open") --- */
+        #entry-curtain {
+            z-index: 9999;
+            background: #800000; /* Solid Maroon */
+            color: #f1d279;
+            cursor: pointer;
+        }
+
+        #entry-curtain h1 {
+            font-size: 2.5rem;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* --- TEXT & BUTTONS --- */
+        .container {
+            text-align: center;
+            color: #f1d279; /* Gold */
+            padding: 20px;
+            z-index: 10;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+            line-height: 1.2;
+        }
+
+        .witty-line {
+            font-size: 1.4rem;
+            color: #ffffff;
+            font-style: italic;
+            margin-bottom: 40px;
+            min-height: 60px; /* Keeps layout stable */
+            text-shadow: 1px 1px 5px rgba(0,0,0,1);
+            transition: color 0.3s ease;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+        }
+
+        button {
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 50px;
+            border: 3px solid #f1d279;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #yesBtn {
+            background-color: #f1d279;
+            color: #800000;
+        }
+
+        #yesBtn:hover {
+            transform: scale(1.1);
+            background-color: #fff;
+        }
+
+        #noBtn {
+            background-color: transparent;
+            color: white;
+            /* Position absolute will be applied via JS */
+        }
+
+        /* --- SUCCESS SCREEN --- */
+        #success-msg {
+            display: none; /* Hidden by default */
+            z-index: 20;
+        }
+
+        #success-msg h1 {
+            font-size: 4rem;
+            color: #f1d279;
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .success-gif {
+            border-radius: 20px;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .cal-btn {
+            margin-top: 30px;
+            padding: 12px 25px;
+            background: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: background 0.3s;
+        }
+        
+        .cal-btn:hover { background: #3367d6; }
+
+        /* --- NOTIFICATION BANNER --- */
+        #notification {
+            position: fixed;
+            top: -150px; /* Starts hidden above screen */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+            transition: top 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(5px);
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="song.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="bg-gif" id="bg"></div>
+
+    <div class="overlay" id="entry-curtain" onclick="startExperience()">
+        <h1>Tap to Open ❤️</h1>
+        <p style="color: white; margin-top: 10px;">(Please turn sound on 🔊)</p>
+    </div>
+    
+    <div class="overlay" id="main-view" style="display: none;">
+        <div class="container">
+            <h1>Nim Nim, will you be my Valentine?</h1>
+            
+            <p class="witty-line" id="status-text">"You stole my heart, now let me steal you for a date." ❤️</p>
+            
+            <div class="buttons">
+                <button id="yesBtn" onclick="showLove()">Ji, Bilkul!</button>
+                <button id="noBtn" onmouseover="moveButton()">Nahi</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="success-msg">
+        <h1>Shabash! ❤️</h1>
+        <p style="color: white; font-size: 1.5rem; margin-top: 10px;">Check the notification above! ☝️</p>
+        
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpwaGZ4ZzBqZzBqZzBqZzBqZzBqZzBqZzBqZzBqZzBqZzBqJmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/lTQF0ODLLjhza/giphy.gif" class="success-gif">
+        
+        <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Dinner+Date+with+Hubby+%E2%9D%A4%EF%B8%8F&dates=20260213T133000Z/20260213T163000Z&details=Get+ready+by+7+PM!+It's+a+surprise.&location=Bangalore&add=fayiqc@gmail.com&sf=true&output=xml" 
+           target="_blank" 
+           class="cal-btn">
+           📅 Confirm Date (Notify Me!)
+        </a>
+    </div>
+
+    <div id="notification">
+        <div style="font-size: 2rem;">🔔</div>
+        <div>
+            <h4 style="margin:0;">New Reminder</h4>
+            <p style="margin:5px 0 0; color:#666; font-size: 0.9rem;"><strong>Dinner Date:</strong> 13th Feb. Be ready by 7 PM! 👗</p>
+        </div>
+    </div>
+
+    <script>
+        const wittyRemarks = [
+            "Nice try, beautiful!",
+            "Nope, you're stuck with me!",
+            "I promise to give foot massages!",
+            "Wrong button, honey!",
+            "My heart only says YES!",
+            "But I bought chocolates...",
+            "Are you sure? Look at my cute face!",
+            "There is no escape from my love!"
+        ];
+        
+        let i = 0;
+
+        // 1. START EXPERIENCE
+        function startExperience() {
+            var audio = document.getElementById("bg-music");
+            audio.volume = 0.5; // 50% Volume
+            
+            // Try to play audio
+            audio.play().catch(error => {
+                console.log("Audio play failed (user interaction needed): " + error);
+            });
+
+            // Fade out curtain
+            document.getElementById('entry-curtain').style.opacity = '0';
+            
+            // Wait for fade to finish, then show question
+            setTimeout(() => {
+                document.getElementById('entry-curtain').style.display = 'none';
+                document.getElementById('main-view').style.display = 'flex';
+            }, 800);
+        }
+
+        // 2. MOVE "NAHI" BUTTON
+        function moveButton() {
+            const noBtn = document.getElementById('noBtn');
+            const statusText = document.getElementById('status-text');
+
+            // Set to fixed position so it can move anywhere
+            noBtn.style.position = 'fixed';
+
+            // Calculate random position within viewport
+            // Subtracting button size (approx 150px width, 60px height) to keep it on screen
+            const maxX = window.innerWidth - 150;
+            const maxY = window.innerHeight - 80;
+
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+
+            // Update witty text
+            statusText.innerText = wittyRemarks[i];
+            
+            // Text flash effect
+            statusText.style.color = "#ff6b6b"; 
+            setTimeout(() => { statusText.style.color = "white"; }, 300);
+
+            // Cycle through remarks
+            i = (i + 1) % wittyRemarks.length;
+        }
+
+        // 3. SHOW SUCCESS SCREEN
+        function showLove() {
+            // Hide Question
+            document.getElementById('main-view').style.display = 'none';
+            
+            // Show Success
+            const successMsg = document.getElementById('success-msg');
+            successMsg.style.display = 'flex';
+            
+            // Change Background to Celebration Gif
+            document.getElementById('bg').style.backgroundImage = "url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpwaGZ4ZzBqZzBqZzBqZzBqZzBqZzBqZzBqZzBqZzBqZzBqJmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/lTQF0ODLLjhza/giphy.gif')";
+
+            // Drop down notification after 1 second
+            setTimeout(() => {
+                document.getElementById('notification').style.top = '20px';
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
